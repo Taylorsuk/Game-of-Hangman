@@ -1,18 +1,22 @@
 import random
 import re
-# start with a list of words for the player to guess
-wordsToGuess = ['javascript', 'python', 'algorithm', 'vscode', 'cobol', 'complier', 'angular', 'react', 'svelt']
-allowedGuesses = 10
+
+# import the wordlist
+txtfile = open('word_list.txt', 'r')
+wordsToGuess = txtfile.readlines()
+allowedGuesses = 7
 incorrectGuesses = []
 correctGuesses = []
 randomWord = random.choice(wordsToGuess)
 guessWord = []
 
 # we have a random word so we can now start the game
-print("Lets play a game of Dev Hangman")
+print("Lets play a game of Hangman")
 
 for character in randomWord:
-    guessWord.append('_')
+    guessWord.append('*')
+
+print("The word you are trying to guess is {}".format(''.join(guessWord)))
 
 # while they still have guesses in the bank run this loop
 while allowedGuesses - len(incorrectGuesses) > 0:
@@ -30,14 +34,14 @@ while allowedGuesses - len(incorrectGuesses) > 0:
         continue
     # already tried the letter
     elif (letterGuess in correctGuesses) or (letterGuess in incorrectGuesses):
-        print("You have already tried {}, try another letter".format(letterGuess))
+        print("You have already tried {}. Please enter your next guess: {}".format(letterGuess, ''.join(guessWord)))
         continue
 
     # letter is in the word
     letterIndex = randomWord.find(letterGuess)
     if letterIndex >= 0:  # letterGuess in randomWord:
         correctGuesses.append(letterGuess)
-        print('awesome guess, {} is in the word'.format(letterGuess))
+        print('awesome guess, {} is in the word.'.format(letterGuess))
         guessWord[letterIndex] = letterGuess
 
     # incorrect guess
@@ -47,19 +51,19 @@ while allowedGuesses - len(incorrectGuesses) > 0:
         # calculate the guesses remaining
         remaining = allowedGuesses - len(incorrectGuesses)
         # notify the user
-        print("Sorry, you lose a life, {} is not in the secret word, {} guesses remaining".format(letterGuess, remaining))
+        print("Sorry, you lose a life, {} is not in the secret word, {} guesses remaining. \n\n Please enter your next guess: {}".format(letterGuess, remaining, ''.join(guessWord)))
 
         # check if that was their last life
         if remaining == 0:
-            print('sorry, you failed to guess the word: {}, why not give it another go!'.format(randomWord))
+            print('Sorry, you failed to guess the word: {}, you lose, why not give it another go!'.format(randomWord))
             break
 
         print('Incorrect guesses: {}'.format(incorrectGuesses))
 
     # show current status
-    print('Your progress: {}'.format(''.join(guessWord)))
+    print('Please enter your next guess: {}'.format(''.join(guessWord)))
 
     # they have guessed all the letters Winner!
     if len(correctGuesses) == len(randomWord):
-        print('You won the game!')
+        print('Congratulations you win')
         break
