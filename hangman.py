@@ -7,16 +7,22 @@ wordsToGuess = txtfile.readlines()
 allowedGuesses = 7
 incorrectGuesses = []
 correctGuesses = []
-randomWord = random.choice(wordsToGuess)
+randomWord = random.choice(wordsToGuess).strip()
 guessWord = []
+maskCharacter = '*'
 
 # we have a random word so we can now start the game
 print("Lets play a game of Hangman")
 
 for character in randomWord:
-    guessWord.append('*')
+    guessWord.append(maskCharacter)
 
 print("The word you are trying to guess is {}".format(''.join(guessWord)))
+
+
+def findOccurrences(s, ch):
+    return [i for i, letter in enumerate(s) if letter == ch]
+
 
 # while they still have guesses in the bank run this loop
 while allowedGuesses - len(incorrectGuesses) > 0:
@@ -38,11 +44,15 @@ while allowedGuesses - len(incorrectGuesses) > 0:
         continue
 
     # letter is in the word
-    letterIndex = randomWord.find(letterGuess)
-    if letterIndex >= 0:  # letterGuess in randomWord:
+    # letterIndex = randomWord.find(letterGuess)
+    letterIndices = findOccurrences(randomWord, letterGuess)
+    # if letterIndex >= 0:
+    if len(letterIndices) > 0:
         correctGuesses.append(letterGuess)
-        print('awesome guess, {} is in the word.'.format(letterGuess))
-        guessWord[letterIndex] = letterGuess
+        print('awesome guess, "{}" is in the word.'.format(letterGuess))
+
+        for letterIndex in letterIndices:
+            guessWord[letterIndex] = letterGuess
 
     # incorrect guess
     else:
@@ -51,19 +61,24 @@ while allowedGuesses - len(incorrectGuesses) > 0:
         # calculate the guesses remaining
         remaining = allowedGuesses - len(incorrectGuesses)
         # notify the user
-        print("Sorry, you lose a life, {} is not in the secret word, {} guesses remaining. \n\n Please enter your next guess: {}".format(letterGuess, remaining, ''.join(guessWord)))
+        print("Sorry, you lose a life, '{}' is not in the secret word, {} guesses remaining. \n\n Please enter your next guess: {}".format(
+            letterGuess, remaining, ''.join(guessWord)))
 
         # check if that was their last life
         if remaining == 0:
-            print('Sorry, you failed to guess the word: {}, you lose, why not give it another go!'.format(randomWord))
+            print('Sorry, you failed to guess the word: "{}", you lose, why not give it another go!'.format(randomWord))
             break
 
-        print('Incorrect guesses: {}'.format(incorrectGuesses))
+        print('Incorrect guesses: "{}"'.format(incorrectGuesses))
 
     # show current status
     print('Please enter your next guess: {}'.format(''.join(guessWord)))
 
+    # let's see how many remaining stars there are:
+    remainingStars = findOccurrences(guessWord, maskCharacter)
+
     # they have guessed all the letters Winner!
-    if len(correctGuesses) == len(randomWord):
+    # if len(correctGuesses) == len(randomWord):
+    if len(remainingStars) == 0:
         print('Congratulations you win')
         break
